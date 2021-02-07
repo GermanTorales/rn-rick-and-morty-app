@@ -1,3 +1,5 @@
+import { Dimensions } from "react-native";
+
 const getProperty = {
   get: (target, prop, arr) => {
     if (typeof prop === "string") {
@@ -28,3 +30,6 @@ const getProperty = {
 export const LinearColors = ["#22A5B2", "#3b5998", "#192f6a"];
 
 export const StatusColors = new Proxy(["alive", "dead", "unknown"], getProperty);
+
+export const Width = Dimensions.get("window").width;
+export const Height = Dimensions.get("window").height;
