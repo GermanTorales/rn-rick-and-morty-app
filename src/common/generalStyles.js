@@ -33,3 +33,6 @@ export const StatusColors = new Proxy(["alive", "dead", "unknown"], getProperty)
 
 export const Width = Dimensions.get("window").width;
 export const Height = Dimensions.get("window").height;
+
+export const NotFoundImage =
+  "https://pbs.twimg.com/profile_images/600060188872155136/st4Sp6Aw_400x400.jpg";
