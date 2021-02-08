@@ -1,22 +1,23 @@
 import React from "react";
 import { Image, TouchableWithoutFeedback, View, StyleSheet, Text } from "react-native";
 import { Card } from "react-native-elements";
+import { NotFoundImage } from "../generalStyles";
 
 const imagesHeight = 100;
 const imagesWidth = 100;
 
 const Item = ({ handlePress, data }) => (
-  <TouchableWithoutFeedback onPress={() => handlePress(data)}>
+  <TouchableWithoutFeedback onPress={() => handlePress(data.id)}>
     <Card style={styles.container}>
       <Card.Title>{data.title}</Card.Title>
       <View style={styles.dataInfo}>
         <View>
-          <Image style={styles.dataImage} resizeMode="cover" source={{ uri: data.image }} />
+          <Image style={styles.dataImage} resizeMode="cover" source={{ uri: data?.image || NotFoundImage }} />
         </View>
         <View>
           {data?.text?.map(([field, value], inx) => (
             <Text key={inx} style={styles.characterInfoText}>
-              {field}: {value}
+              {field}: {value.length > 10 ? value.substring(0, 9).concat('...') : value}
             </Text>
           ))}
         </View>
@@ -37,7 +38,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   dataImage: {
-    // flex: 1,
     width: imagesWidth,
     height: imagesHeight,
   },
