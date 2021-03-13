@@ -4,10 +4,10 @@ import { Width } from "../../common/generalStyles";
 import Item from "../../common/Item";
 import ComponentWithLinearGradient from "../../common/LinearGradient";
 import Loader from "../../common/Loader";
-import { getLocations } from "../../helpers/api";
+import { getEpisodes } from "../../helpers/api";
 
-const Locations = ({ navigation }) => {
-  const [locations, setLocations] = useState([]);
+const Episodes = ({ navigation }) => {
+  const [episodes, setEpisodes] = useState([]);
   const [page, setPage] = useState(1);
   const [haveNext, setHaveNext] = useState(true);
   const flatListRef = useRef();
@@ -15,43 +15,39 @@ const Locations = ({ navigation }) => {
   const toTop = () => flatListRef.current.scrollToOffset({ animated: true, offset: 0 });
 
   const setData = async (pageNumber) => {
-    const data = await getLocations(pageNumber);
-
-    setPage(data?.info?.pages);
+    const data = await getEpisodes(pageNumber);
 
     setHaveNext(Boolean(data?.info?.next));
 
-    const newData = data?.results?.map(({ name, image, type, dimension, id }) => {
-      name = name.length >= 13 ? name.substring(0, 13).concat("...") : name;
-      dimension = dimension.length >= 13 ? dimension.substring(0, 13).concat("...") : dimension;
-
+    const newData = data?.results?.map(({ name, air_date, episode, characters, id }) => {
       return {
         id,
         title: name,
-        image,
         text: [
-          ["Location", name],
-          ["Type", type],
-          ["Dimension", dimension],
+          ["Episode", episode],
+          ["Air date", air_date],
+          ["Characters count", characters.length],
         ],
       };
     });
 
-    setLocations(newData);
+    setEpisodes(newData);
     toTop();
   };
 
   const onLoadMoreData = async () => {
+    setPage(page + 1);
+
     haveNext && (await setData(page));
   };
 
   const handlePress = (id) => {
-    navigation.navigate("SingleLocation", {
-      locationId: id,
+    navigation.navigate("SingleEpisode", {
+      episodeId: id,
     });
   };
 
-  const renderLocation = ({ item }) => <Item handlePress={handlePress} data={item} />;
+  const renderEpisodes = ({ item }) => <Item handlePress={handlePress} data={item} />;
 
   useEffect(() => {
     let mounted = true;
@@ -69,8 +65,8 @@ const Locations = ({ navigation }) => {
     <FlatList
       ref={flatListRef}
       style={styles.container}
-      data={locations}
-      renderItem={renderLocation}
+      data={episodes}
+      renderItem={renderEpisodes}
       keyExtractor={(item, index) => index.toString()}
       onEndReached={onLoadMoreData}
       ListFooterComponent={haveNext ? Loader("large") : null}
@@ -87,4 +83,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Locations;
+export default Episodes;
