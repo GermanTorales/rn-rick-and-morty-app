@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { StyleSheet } from "react-native";
 import { Width } from "../../common/generalStyles";
 import { FlatList } from "react-native-gesture-handler";
@@ -10,9 +10,15 @@ import ComponentWithLinearGradient from "../../common/LinearGradient";
 const Characters = ({ navigation }) => {
   const [characters, setCharacters] = useState([]);
   const [page, setPage] = useState(1);
+  const [haveNext, setHaveNext] = useState(true);
+  const flatListRef = useRef();
+
+  const toTop = () => flatListRef.current.scrollToOffset({ animated: true, offset: 0 });
 
   const setData = async (pageNumber) => {
     const data = await getCharacters(pageNumber);
+
+    setHaveNext(Boolean(data?.info?.next));
 
     const newData = data?.results?.map(({ name, image, species, status, id }) => ({
       id,
@@ -25,9 +31,8 @@ const Characters = ({ navigation }) => {
       ],
     }));
 
-    const result = [...characters, ...newData];
-
-    setCharacters(result);
+    setCharacters(newData);
+    toTop();
   };
 
   const handlePress = (id) => {
@@ -43,11 +48,9 @@ const Characters = ({ navigation }) => {
   };
 
   const onLoadMoreData = async () => {
-    const newPage = page + 1;
+    setPage(page + 1);
 
-    await setData(newPage);
-
-    setPage(newPage);
+    haveNext && (await setData(page));
   };
 
   const renderCharacter = ({ item }) => <Item handlePress={handlePress} data={item} />;
@@ -66,6 +69,7 @@ const Characters = ({ navigation }) => {
 
   const component = () => (
     <FlatList
+      ref={flatListRef}
       style={styles.container}
       data={characters}
       renderItem={renderCharacter}
